@@ -18,8 +18,11 @@ package org.apache.dubbo.config.spring.beans.factory.annotation;
 
 import org.apache.dubbo.config.spring.ServiceBean;
 import org.apache.dubbo.config.spring.api.HelloService;
+import org.apache.dubbo.rpc.model.ApplicationModel;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +52,16 @@ import java.util.Map;
 })
 public class ServiceAnnotationBeanPostProcessorTest {
 
+    @Before
+    public void setUp() {
+        ApplicationModel.reset();
+    }
+
+    @After
+    public void tearDown() {
+        ApplicationModel.reset();
+    }
+
     @Autowired
     private ConfigurableListableBeanFactory beanFactory;
 
@@ -76,6 +89,19 @@ public class ServiceAnnotationBeanPostProcessorTest {
 
         Assert.assertTrue(beanPostProcessorsMap.containsKey("serviceAnnotationBeanPostProcessor"));
         Assert.assertTrue(beanPostProcessorsMap.containsKey("serviceAnnotationBeanPostProcessor2"));
+
+    }
+
+    @Test
+    public void testMethodAnnotation() {
+
+        Map<String, ServiceBean> serviceBeansMap = beanFactory.getBeansOfType(ServiceBean.class);
+
+        Assert.assertEquals(2, serviceBeansMap.size());
+
+        ServiceBean demoServiceBean = serviceBeansMap.get("ServiceBean:org.apache.dubbo.config.spring.api.DemoService:2.5.7");
+
+        Assert.assertNotNull(demoServiceBean.getMethods());
 
     }
 
